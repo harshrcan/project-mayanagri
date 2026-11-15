@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Project Mayanagri"
 config/description="Stylized open-world crime game set in Mumbai. GTA-style, rags-to-riches campaign. Godot 4, GDScript."
-run/main_scene="res://world/main.tscn"
+run/main_scene="res://world/dharavi_corner.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 
 [display]
