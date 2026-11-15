@@ -261,3 +261,30 @@ picks.
   than warm orange under ACES.
 - **Gate:** Harsh's verdict — lock it (then Step 4 vehicles) or list
   changes.
+
+### Graphics push — GTA V-like character + skyline (2026-11-15)
+
+Harsh asked for "better real gta v like character n graphics" after
+the realistic look test. Two things changed:
+
+- **Character:** the blocky placeholder Vee was replaced by a
+  Blender-modelled humanoid (`tools/build_vee.py` →
+  `characters/vee.glb`, see `docs/STEP3_PLAYER.md` §7). Same
+  animation API, same controller.
+- **Graphics:** the horizon was empty brown. Added a distant Mumbai
+  skyline (`_build_skyline()` in `world/dharavi_corner.gd`): 16
+  dark buildings (10–22 m) ringing the corner at 55–70 m, a few lit
+  windows, fog-hazed. Iteration 1 put them at 45–58 m in
+  `#2e3440` — they read as giant sunlit cardboard boxes looming
+  over the chawls. Iteration 2: pushed to 55–70 m, darker
+  `#262b36`, heights capped at 22 m, ground plane widened 120→200 m
+  so they stand on ground, fog 0.006→0.008. They now read as a
+  distant city. Also added: a second tree on the west sidewalk, a
+  bicycle leaning on building B, softer sun shadows
+  (`shadow_blur` 1.0, max distance 150) and a dim cool fill light
+  from the east (0.2, no shadows).
+- Shots: `docs/step2_shot_realistic.png` + `docs/step3_shot.png`
+  (re-shot). Verification: import clean, headless run exit 0,
+  player tests 15/15 PASS.
+- **Gate:** still Harsh's verdict — lock the look (then Step 4
+  vehicles) or list changes.

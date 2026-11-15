@@ -108,3 +108,27 @@ Adobe account, not CC0).
   numbers live at the top of `characters/player.gd` — walk/run speed,
   accel, gravity, jump velocity, mouse sensitivity. Report what feels
   off and it gets one tuning pass before Step 4.
+
+## 7. Modelled Vee — the blocky placeholder is gone (2026-11-15)
+
+Harsh asked for a "better real gta v like character". The primitive
+Vee (stacked boxes) was replaced by a Blender-modelled humanoid:
+
+- `tools/build_vee.py` builds `characters/vee.glb`: ~1.70 m, real
+  proportions (head 1/7.5 of height, legs 0.85 m), tapered limbs,
+  shoes with toes, shirt + belt + collar, head with skull, jaw, nose,
+  ears, eyes, brows, hair cap + fringe. All flat-colour materials
+  (skin, shirt blue, pants, hair, shoes) — no textures at this scale.
+  All geometry original, modelled here.
+- The .glb carries empty pivot nodes (`LegL/R_pivot` at the hips,
+  `ArmL/R_pivot` at the shoulders, `Torso_pivot`, `Head_pivot`).
+- `characters/vee_placeholder.gd` now loads the .glb and finds the
+  pivots by name; `animate()` is byte-for-byte the same math as
+  before (same swing, bob, tuck, punch). `player.gd` is untouched —
+  the swap is invisible to the controller.
+- Verification: player tests still 15/15 PASS (the walk/run/jump
+  path exercises `animate()` on the new pivots), headless run clean.
+- The CC0 rigged-character swap (Quaternius, documented in
+  `docs/ASSET_LICENCES.md`) is still an option for later — the
+  modelled Vee is the current visual, and the pivot structure means
+  a rigged model can drop into the same `animate()` API.
