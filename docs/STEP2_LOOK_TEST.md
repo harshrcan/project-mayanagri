@@ -112,3 +112,30 @@ textured.
 - **Step 2 check is Harsh's call:** only he can say if the shot is one
   he'd post. If he locks it, Step 3 (player controller) starts. If not,
   he lists what to change and it gets one more pass.
+
+## 7. Direction change — GTA San Andreas graphics (2026-11-15)
+
+Harsh locked the flat-colour look ("go ahead"), then redirected:
+**graphics like GTA San Andreas**, and **size doesn't matter**
+("dont care about size"). So the flat-colour look above is SUPERSEDED,
+not locked any more. What changes for this corner:
+
+- Flat colours → real textures: brick/plaster walls with windows,
+  shutters, grime; road with lane markings and patches; pavement slabs.
+- Density: more props per metre (bins, crates, wires, posters, plants),
+  the way SA streets are cluttered, not clean.
+- Light stays warm and hazy, but the haze becomes SA-style draw-distance
+  fog rather than a colour wash.
+- Size targets from the plan (~1 GB PC, <500 MB Android) no longer
+  constrain the graphics work.
+- Textures are painted by hand / CC0 (same licence rules — every texture
+  gets a row in `docs/ASSET_LICENCES.md`). No textures ripped from SA
+  itself — that would be Rockstar's art, not ours.
+
+Open question: **original 2004 SA or Definitive Edition?** The 2004
+look is low-res textures + heavy haze (PS2-era); the Definitive Edition
+is sharper textures + bright blue skies + cleaner light. References
+pulled 2026-11-15 (kept outside the repo — Rockstar screenshots, not
+ours to commit): `~/workspace/sa_ref_original.jpg`,
+`~/workspace/sa_ref_de.jpg`. The corner gets its texture/density pass
+once Harsh picks.

@@ -90,7 +90,14 @@ docs/   tools/
 
 ## 7. Style
 
-- Stylized low-poly, flat / lightly painted textures in shared atlases.
+- **Graphics target: GTA San Andreas** (Harsh, 2026-11-15) — textured
+  low-poly in the SA mould: real textures on buildings, roads and props
+  (not flat colours), dense streets, warm hazy light, long draw distance
+  with fog. Variant (original 2004 vs Definitive Edition) to be confirmed
+  — see `docs/STEP2_LOOK_TEST.md`.
+- **Size budget lifted** (Harsh, 2026-11-15 — "dont care about size"):
+  the plan's ~1 GB PC / <500 MB Android targets no longer constrain the
+  graphics work. Use the textures and detail the look needs.
 - Strong lighting: warm golden evenings, neon/tube-light nights, grey wet
   monsoon days. Mumbai colour: painted shutters, hand-lettered signboards
   (Hindi / Marathi / English), truck art, invented film posters.
