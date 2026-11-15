@@ -16,12 +16,12 @@ static func create() -> Node3D:
 	var stall := Node3D.new()
 	stall.name = "ChaiStall"
 
-	# Counter + top + back wall + shelves.
-	Prim.box(stall, Vector3(0, 0.5, 0.55), Vector3(2.4, 1.0, 0.15), WOOD)
-	Prim.box(stall, Vector3(0, 1.02, 0), Vector3(2.4, 0.08, 1.3), WOOD_LIGHT)
-	Prim.box(stall, Vector3(0, 0.8, -0.55), Vector3(2.4, 1.6, 0.15), WOOD)
-	Prim.box(stall, Vector3(0, 1.15, -0.42), Vector3(2.2, 0.06, 0.3), WOOD_LIGHT)
-	Prim.box(stall, Vector3(0, 1.55, -0.42), Vector3(2.2, 0.06, 0.3), WOOD_LIGHT)
+	# Counter + top + back wall + shelves (wood texture, SA-DE pass).
+	Prim.box(stall, Vector3(0, 0.5, 0.55), Vector3(2.4, 1.0, 0.15), Prim.tmat("wood", Color.WHITE, Vector3(2, 1, 1)))
+	Prim.box(stall, Vector3(0, 1.02, 0), Vector3(2.4, 0.08, 1.3), Prim.tmat("wood", Color.WHITE, Vector3(2, 1, 1)))
+	Prim.box(stall, Vector3(0, 0.8, -0.55), Vector3(2.4, 1.6, 0.15), Prim.tmat("wood", Color.WHITE, Vector3(2, 1, 1)))
+	Prim.box(stall, Vector3(0, 1.15, -0.42), Vector3(2.2, 0.06, 0.3), Prim.tmat("wood", Color.WHITE, Vector3(2, 1, 1)))
+	Prim.box(stall, Vector3(0, 1.55, -0.42), Vector3(2.2, 0.06, 0.3), Prim.tmat("wood", Color.WHITE, Vector3(2, 1, 1)))
 	# Jars on the shelves (chai masala, sugar, biscuits).
 	Prim.cyl(stall, Vector3(-0.7, 1.3, -0.42), 0.09, 0.24, Color("d9a441"))
 	Prim.cyl(stall, Vector3(-0.4, 1.3, -0.42), 0.09, 0.24, Color("b0522f"))
@@ -55,7 +55,7 @@ static func create() -> Node3D:
 	for px in [-1.1, 1.1]:
 		for pz in [-0.55, 0.55]:
 			Prim.cyl(stall, Vector3(px, 1.25, pz), 0.04, 2.5, WOOD)
-	Prim.box(stall, Vector3(0, 2.55, 0), Vector3(2.7, 0.05, 1.6), ROOF_RUST, 0.0, Vector3(0.08, 0, 0))
+	Prim.box(stall, Vector3(0, 2.55, 0), Vector3(2.7, 0.05, 1.6), Prim.tmat("tin", Color.WHITE, Vector3(2, 1, 1)), 0.0, Vector3(0.08, 0, 0))
 	# Tube light (emissive) + the warm omni light that lights the counter.
 	Prim.box(stall, Vector3(0, 1.78, 0.45), Vector3(1.6, 0.06, 0.06), Color("ffd9a0"), 3.0)
 	var light := OmniLight3D.new()
@@ -67,6 +67,6 @@ static func create() -> Node3D:
 	stall.add_child(light)
 	# Two stools in front.
 	for sx in [-0.8, 0.8]:
-		Prim.cyl(stall, Vector3(sx, 0.55, 1.15), 0.18, 0.06, WOOD_LIGHT)
+		Prim.cyl(stall, Vector3(sx, 0.55, 1.15), 0.18, 0.06, Prim.tmat("wood", Color.WHITE, Vector3(1, 1, 1)))
 		Prim.cyl(stall, Vector3(sx, 0.28, 1.15), 0.04, 0.55, WOOD)
 	return stall

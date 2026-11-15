@@ -10,6 +10,7 @@ written down here.
 | Asset | Source | Licence | Notes |
 |---|---|---|---|
 | Dharavi corner, chai stall, auto, handcart (all primitives) | Built in-project, `world/`, `vehicles/` | Original (ours) | Flat colours, no textures yet |
+| Procedural textures (brick, plaster, asphalt, pavement, tin, wood, cloud) | Generated in-project by `tools/make_textures.py` (numpy + PIL), `world/textures/` | Original (ours) | 256×256 tileable PNGs, SA-DE pass 2026-11-15 |
 | Vee placeholder body | Built in-project, `characters/vee_placeholder.gd` | Original (ours) | Procedural poses, replaced later |
 | "Amrut Chai", "General Store", "Bhai" names/signs | Invented in-project | Original (ours) | No real brands |
 | Godot 4.7.2 engine | godotengine.org | MIT | Engine, not a game asset |
