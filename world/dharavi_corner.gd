@@ -7,6 +7,7 @@ extends Node3D
 const Prim = preload("res://world/prim.gd")
 const AutoScript = preload("res://vehicles/auto.gd")
 const StallScript = preload("res://world/chai_stall.gd")
+const PlayerScene = preload("res://characters/player.tscn")
 
 const ASPHALT := Color("2e2a26")
 const SIDEWALK := Color("6f655a")
@@ -33,8 +34,9 @@ func _ready() -> void:
 	_build_stall_and_auto()
 	_build_props()
 	_build_camera()
+	_build_player()
 	print("[Mayanagri] Dharavi corner ready.")
-	if "--shot" in OS.get_cmdline_user_args():
+	if "--shot" in OS.get_cmdline_user_args() or "--shot-player" in OS.get_cmdline_user_args():
 		_take_screenshot()
 
 
@@ -78,7 +80,9 @@ func _build_environment() -> void:
 
 
 func _build_ground() -> void:
-	Prim.plane(self, Vector3(0, 0, 0), Vector2(120, 120), ASPHALT)
+	# Solid slab, not a visual-only plane: the player must stand on it
+	# (Step 3 caught the plane having no collision — Vee fell through).
+	Prim.solid_box(self, Vector3(0, -0.05, 0), Vector3(120, 0.1, 120), ASPHALT)
 	# L-shaped sidewalk in the north-west quadrant, in front of the buildings.
 	Prim.box(self, Vector3(-8.5, 0.06, -4.5), Vector3(11, 0.12, 3), SIDEWALK)
 	Prim.box(self, Vector3(-4.5, 0.06, -8.5), Vector3(3, 0.12, 11), SIDEWALK)
@@ -211,12 +215,22 @@ func _build_camera() -> void:
 	cam.look_at(Vector3(-3, 1.5, -3.5), Vector3.UP)
 
 
+func _build_player() -> void:
+	# No player in --shot mode: the fixed camera owns the frame then.
+	# (--shot-player spawns the player and shoots from his camera.)
+	if "--shot" in OS.get_cmdline_user_args():
+		return
+	var player := PlayerScene.instantiate()
+	player.position = Vector3(0, 0.3, 8)
+	add_child(player)
+
+
 func _take_screenshot() -> void:
 	# Let the renderer settle a few frames, then save the viewport image.
 	for i in 10:
 		await get_tree().process_frame
 	var img := get_viewport().get_texture().get_image()
-	var path := "res://docs/step2_shot.png"
+	var path := "res://docs/step3_shot.png" if "--shot-player" in OS.get_cmdline_user_args() else "res://docs/step2_shot.png"
 	var err := img.save_png(path)
 	if err == OK:
 		print("[Mayanagri] screenshot saved to ", path, " (", img.get_width(), "x", img.get_height(), ")")
