@@ -1,8 +1,9 @@
 # Step 1 — Tool setup + repo + folder layout + AI rules
 
-**Status: DONE except GitHub remote (needs Harsh — see §4).**
+**Status: DONE — empty project runs and is pushed.**
 Date: 2026-11-15. Plan §10 step 1. Check: *empty project runs and is pushed*
-→ runs: ✅ verified below. Pushed: ⏳ blocked on repo creation decision.
+→ runs: ✅ verified below. Pushed: ✅ 2026-11-15, `main` = `81bd69d`
+(Step 2's commit — the push happened after Step 2 was built locally).
 
 ## 1. Spec (plain words)
 
@@ -80,22 +81,21 @@ and correctly git-ignored.
 — "step1: tool setup — Godot 4.7.2, Blender 5.2.3 LTS, folder layout, AI
 rules, empty project runs", 21 files.
 
-**GitHub:** connector status `connected` (account harshrcan). Searched
-GitHub for `project-mayanagri` → **0 results, repo does not exist yet**.
-Creation is ready to go via the connector's `create_repository` — but the
-repo does NOT exist and nothing is pushed yet, because visibility is Harsh's
-call (below).
+**GitHub:** connector status `connected` (account harshrcan). The connector's
+`create_repository` returned 403 (the Muse GitHub App cannot create repos —
+same limit as the INFO 2413 attempt). Harsh then created the empty **public**
+repo himself on github.com at 02:24 PST
+(https://github.com/harshrcan/project-mayanagri) and authorised the `gh`
+CLI via device code, so pushes work from here (`gh auth setup-git` now
+provides the git credential helper). Pushed 2026-11-15: `main` → `81bd69d`,
+verified via `git ls-remote origin HEAD`. One note: `gh` stores its token
+in plain text under `~/.config/gh/hosts.yml` (its default on Linux without
+a keyring) — acceptable in this VM, but do not copy that file anywhere.
 
 ## 5. What still needs Harsh
 
-1. **Repo visibility — private or public?** (one-word answer)
-   Plan §11 is build-in-public (clips from week 1, Discord at demo), which
-   leans public — but a public repo from day one also publishes all code.
-   Recommended: **private now, flip to public at the Step 10 demo** — keeps
-   the option open either way. Once he answers, creation + first push is one
-   command:
-   `create_repository(name="project-mayanagri", private=<true/false>)`
-   then `git remote add origin … && git push -u origin main`.
+1. **Repo — DONE.** Public, https://github.com/harshrcan/project-mayanagri,
+   pushed, `main` = `81bd69d`.
 2. **Install on his laptop** (only needed when he wants to open/play it
    himself): Godot 4.7.2-stable Windows + Blender 5.2.3 LTS, links in §2.
    Not needed to keep building here — this workspace already runs it.

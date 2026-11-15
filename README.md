@@ -85,6 +85,6 @@ Progress is logged per step in `docs/` — see `docs/STEP1_SETUP.md`.
 
 ## GitHub
 
-Repo: **not created yet** — see `docs/STEP1_SETUP.md` for the exact creation
-command and the decision Harsh still needs to make (private vs public).
-Local git is initialised; first commit is Step 1 only.
+Repo: **https://github.com/harshrcan/project-mayanagri** (public).
+`main` is the working branch; commit daily at minimum. Full setup log:
+`docs/STEP1_SETUP.md`.
