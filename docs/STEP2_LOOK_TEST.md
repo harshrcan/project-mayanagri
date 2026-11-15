@@ -178,3 +178,24 @@ ours to commit): `~/workspace/sa_ref_original.jpg`,
   the new look). Headless run clean; player tests still 15/15 PASS.
 - **DE check is Harsh's:** lock it and Step 4 (vehicles) starts; or
   list what to change.
+
+## 8. Direction change #2 — modern good 3D, not retro SA (2026-11-15)
+
+Harsh rejected the DE rework: "no real gta san andreas like graphics
+like 3d and all good great graphics". Read plainly: he does NOT want
+the game to look like actual San Andreas (dated PS2-era geometry,
+even the Definitive Edition). He wants proper modern 3D graphics —
+the SA part is the world and gameplay (open streets, cars, third
+person), not the look. The DE rework above is SUPERSEDED, kept in git
+history only (commit e93116f). The procedural texture set stays useful
+— a modern look still needs textures — but the corner must be rebuilt
+the modern way: Blender-modelled buildings (window frames, balconies,
+parapets, AC units, pipes) instead of textured boxes, detailed
+vehicles and props, better lighting/shadows, a rigged character
+instead of the primitive Vee.
+
+Open question: **realistic-modern (GTA V style) or stylized-modern
+(No Straight Roads 2 style)?** References pulled 2026-11-15 (kept
+outside the repo): `~/workspace/ref_gta5.jpg`,
+`~/workspace/ref_stylized.jpg`. The new look test starts once Harsh
+picks.
