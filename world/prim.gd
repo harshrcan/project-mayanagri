@@ -145,3 +145,16 @@ static func solid_box(parent: Node, pos: Vector3, size: Vector3, mat_or_color) -
 	body.add_child(shape)
 	parent.add_child(body)
 	return mi
+
+
+## An invisible collision box (for .glb visuals that carry no collision).
+static func collision_box(parent: Node, pos: Vector3, size: Vector3) -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.position = pos
+	var shape := CollisionShape3D.new()
+	var box_shape := BoxShape3D.new()
+	box_shape.size = size
+	shape.shape = box_shape
+	body.add_child(shape)
+	parent.add_child(body)
+	return body

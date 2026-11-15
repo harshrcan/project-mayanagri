@@ -11,7 +11,7 @@ import os
 import numpy as np
 from PIL import Image
 
-S = 256
+S = 512
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "world", "textures")
 os.makedirs(OUT, exist_ok=True)
 
@@ -67,20 +67,24 @@ def _hex(h):
 
 def brick(base_hex, mortar_hex, seed=1):
     """8 bricks across, 16 rows; offset every other row; per-brick shade."""
-    bw, bh = 32, 16
+    bw, bh = S // 8, S // 16
+    m = S // 128  # mortar width, same world size at any resolution
     base, mortar = _hex(base_hex), _hex(mortar_hex)
     yy, xx = np.mgrid[0:S, 0:S]
     row = yy // bh
     off = (row % 2) * (bw // 2)
     lx = (xx - off) % bw
     ly = yy % bh
-    is_mortar = (lx < 2) | (ly < 2)
+    is_mortar = (lx < m) | (ly < m)
     col = ((xx - off) // bw) % (S // bw)
     rng = np.random.default_rng(seed)
     shades = 0.85 + 0.3 * rng.random((S // bh, S // bw))
-    shade = shades[row, col][:, :, None]
-    img = np.where(is_mortar[:, :, None], mortar, base * shade)
-    grime = fbm(4, 4, 3, seed + 5)
+    rj = 0.92 + 0.16 * rng.random((S // bh, S // bw))
+    gj = 0.94 + 0.12 * rng.random((S // bh, S // bw))
+    sh = shades[row, col]
+    shade_rgb = np.stack([sh * rj[row, col], sh * gj[row, col], sh], axis=-1)
+    img = np.where(is_mortar[:, :, None], mortar, base * shade_rgb)
+    grime = fbm(6, 6, 3, seed + 5)
     img *= (0.90 + 0.20 * grime)[:, :, None]
     stains = fbm(2, 2, 2, seed + 9) > 0.62
     img[stains] *= 0.82
@@ -103,18 +107,21 @@ def asphalt(seed=3):
     rng = np.random.default_rng(seed)
     img += rng.normal(0, 7, (S, S, 1))
     # a couple of lighter repair patches
-    for (x0, y0, w, h) in [(40, 180, 90, 40), (150, 40, 70, 55)]:
+    for (x0, y0, w, h) in [(80, 360, 180, 80), (300, 80, 140, 110)]:
         img[y0:y0 + h, x0:x0 + w] *= 1.18
-    return img
+    # oil stains (small, subtle — a low threshold makes giant ink blots)
+    img[fbm(6, 6, 2, seed + 7) > 0.70] *= 0.85
+    return _add_cracks(img, seed + 11, n=6)
 
 
 def pavement(seed=4):
     base = _hex("8a8178")
     yy, xx = np.mgrid[0:S, 0:S]
-    joint = ((xx % 128) < 3) | ((yy % 128) < 3)
+    slab = S // 2  # 2x2 slabs per tile
+    joint = ((xx % slab) < 6) | ((yy % slab) < 6)
     rng = np.random.default_rng(seed)
     slab_shade = 0.90 + 0.2 * rng.random((2, 2))
-    shade = slab_shade[yy // 128, xx // 128][:, :, None]
+    shade = slab_shade[yy // slab, xx // slab][:, :, None]
     img = np.where(joint[:, :, None], _hex("55504a"), base * shade)
     img *= (0.92 + 0.16 * fbm(6, 6, 3, seed))[:, :, None]
     return img
@@ -138,14 +145,58 @@ def tin(seed=5):
 def wood(base_hex, seed=6):
     base = _hex(base_hex)
     yy, xx = np.mgrid[0:S, 0:S]
-    plank = yy // 64
-    gap = (yy % 64) < 2
+    ph = S // 4  # 4 planks per tile
+    plank = yy // ph
+    gap = (yy % ph) < 4
     rng = np.random.default_rng(seed)
     pshade = 0.88 + 0.24 * rng.random(4)
     shade = pshade[plank][:, :, None]
     grain = fbm(2, 32, 2, seed)
     img = np.where(gap[:, :, None], _hex("3a2a1c"), base * shade * (0.90 + 0.20 * grain)[:, :, None])
     return img
+
+
+def concrete(seed=8):
+    base = _hex("9a938a")
+    img = base * (0.90 + 0.20 * fbm(5, 5, 3, seed))[:, :, None]
+    yy, xx = np.mgrid[0:S, 0:S]
+    img[(yy % 128) < 3] *= 0.88
+    img[fbm(2, 2, 2, seed + 4) > 0.63] *= 0.85
+    return img
+
+
+def leaves(seed=9):
+    base = _hex("3d6a2e")
+    v = fbm(8, 8, 3, seed)
+    img = base * (0.65 + 0.7 * v)[:, :, None]
+    dark = _hex("24461c")
+    m = v < 0.35
+    img[m] = dark * (0.9 + 0.2 * v[m])[:, None]
+    return img
+
+
+def bark(seed=10):
+    base = _hex("6a4a32")
+    v = fbm(2, 16, 3, seed)
+    img = base * (0.8 + 0.4 * v)[:, :, None]
+    return img
+
+
+def _add_cracks(img, seed, n=6):
+    """A few dark jagged cracks, drawn with PIL (clipped, not wrapped)."""
+    from PIL import ImageDraw
+    pil = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8))
+    d = ImageDraw.Draw(pil)
+    rng = np.random.default_rng(seed)
+    for _ in range(n):
+        x, y = rng.integers(0, S, 2)
+        pts = [(int(x), int(y))]
+        for _ in range(12):
+            x = int(np.clip(x + rng.integers(-18, 19), 0, S - 1))
+            y = int(np.clip(y + rng.integers(-18, 19), 0, S - 1))
+            pts.append((x, y))
+        d.line(pts, fill=(20, 18, 16), width=2)
+    return np.array(pil, dtype=float)
 
 
 def cloud(seed=7):
@@ -163,6 +214,8 @@ def cloud(seed=7):
 
 
 def main():
+    global S
+    S = 512
     _save("brick_ochre", brick("c08a4b", "6b5a44", seed=11))
     _save("brick_red", brick("bd6f5c", "6a5044", seed=12))
     _save("plaster", plaster("c9a06a", seed=13))
@@ -170,6 +223,10 @@ def main():
     _save("pavement", pavement(seed=15))
     _save("tin", tin(seed=16))
     _save("wood", wood("7a5230", seed=17))
+    _save("concrete", concrete(seed=19))
+    _save("leaves", leaves(seed=20))
+    _save("bark", bark(seed=21))
+    S = 256
     rgb, a = cloud(seed=18)
     _save("cloud", rgb, alpha=a)
     print("done:", sorted(os.listdir(OUT)))

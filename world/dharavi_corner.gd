@@ -1,27 +1,20 @@
 extends Node3D
-## Step 2 — Dharavi street corner look test. SA-DE edition (Harsh, 2026-11-15).
+## Step 2 — Dharavi street corner look test. Realistic GTA V edition (Harsh, 2026-11-15).
 ## One corner at golden evening: chai stall, parked auto, two chawl blocks.
-## Built from primitives with procedural textures (tools/make_textures.py).
-## Run with `-- --shot` under Xvfb to save a screenshot to docs/step2_shot.png.
-## `-- --shot-de` saves the DE look to docs/step2_shot_de.png.
+## Buildings, streetlight, tree and auto are Blender models (tools/build_dharavi.py);
+## small props stay Prim-based. Textures are procedural (tools/make_textures.py).
+## Run with `-- --shot-real` under Xvfb to save a screenshot to docs/step2_shot_realistic.png.
 
 const Prim = preload("res://world/prim.gd")
-const AutoScript = preload("res://vehicles/auto.gd")
 const StallScript = preload("res://world/chai_stall.gd")
 const PlayerScene = preload("res://characters/player.tscn")
+const BuildingA = preload("res://world/models/building_a.glb")
+const BuildingB = preload("res://world/models/building_b.glb")
+const StreetlightModel = preload("res://world/models/streetlight.glb")
+const TreeModel = preload("res://world/models/tree.glb")
+const AutoModel = preload("res://vehicles/auto.glb")
 
-const ASPHALT := Color("2e2a26")
-const SIDEWALK := Color("6f655a")
-const DRAIN := Color("241f1c")
-const WALL_A := Color("d69a4f")
-const WALL_B := Color("b85a48")
-const ROOF_RUST := Color("8a4632")
-const SHUTTER_TEAL := Color("1f8a80")
-const SHUTTER_GREEN := Color("3f8a46")
-const WINDOW_DARK := Color("241a12")
-const WINDOW_LIT := Color("ffb85c")
 const WOOD_DARK := Color("5a3d22")
-const CRATE := Color("8a6a42")
 const SACK := Color("b09a6a")
 const BUCKET := Color("3f6d8a")
 
@@ -37,7 +30,7 @@ func _ready() -> void:
 	_build_camera()
 	_build_player()
 	print("[Mayanagri] Dharavi corner ready.")
-	if "--shot" in OS.get_cmdline_user_args() or "--shot-player" in OS.get_cmdline_user_args() or "--shot-de" in OS.get_cmdline_user_args():
+	if "--shot" in OS.get_cmdline_user_args() or "--shot-player" in OS.get_cmdline_user_args() or "--shot-de" in OS.get_cmdline_user_args() or "--shot-real" in OS.get_cmdline_user_args():
 		_take_screenshot()
 
 
@@ -57,8 +50,8 @@ func _build_environment() -> void:
 	# Cool blue fill (not sky ambient): warm sun + cool shadows is what
 	# separates the palette — sky ambient alone drowned everything orange.
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color("66779a")
-	env.ambient_light_energy = 0.6
+	env.ambient_light_color = Color("7a7f92")
+	env.ambient_light_energy = 0.7
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
 	env.glow_enabled = true
 	env.glow_intensity = 0.6
@@ -73,9 +66,9 @@ func _build_environment() -> void:
 	add_child(world_env)
 
 	var sun := DirectionalLight3D.new()
-	sun.rotation_degrees = Vector3(-16, -115, 0)
+	sun.rotation_degrees = Vector3(-28, -115, 0)
 	sun.light_color = Color("ffb36b")
-	sun.light_energy = 1.3
+	sun.light_energy = 1.5
 	sun.shadow_enabled = true
 	add_child(sun)
 
@@ -106,46 +99,24 @@ func _build_ground() -> void:
 	Prim.box(self, Vector3(-4, 0.02, -3.05), Vector3(20, 0.04, 0.3), Prim.tmat("asphalt", Color(0.55, 0.55, 0.55), Vector3(20, 1, 1)))
 
 
-func _window(parent: Node, pos: Vector3, lit: bool, facing_x: bool) -> void:
-	var frame_size := Vector3(1.2, 1.4, 0.1) if not facing_x else Vector3(0.1, 1.4, 1.2)
-	var pane_size := Vector3(0.95, 1.15, 0.12) if not facing_x else Vector3(0.12, 1.15, 0.95)
-	Prim.box(parent, pos, frame_size, WINDOW_DARK)
-	if lit:
-		Prim.box(parent, pos, pane_size, WINDOW_LIT, 1.6)
-	else:
-		Prim.box(parent, pos, pane_size, Color("1c150e"))
-
-
 func _build_buildings() -> void:
-	# Building A — ochre chawl along the north side (faces south, toward camera).
-	Prim.solid_box(self, Vector3(-4, 3.5, -7.5), Vector3(20, 7, 3), Prim.tmat("brick_ochre", Color.WHITE, Vector3(10, 3.5, 1.5)))
-	Prim.box(self, Vector3(-4, 7.15, -7.5), Vector3(20.2, 0.15, 3.2), Prim.tmat("tin", Color.WHITE, Vector3(10, 1, 1.6)), 0.0, Vector3(0.1, 0, 0))
-	for x in [-12.0, -8.0, -4.0, 0.0]:
-		_window(self, Vector3(x, 2.2, -5.95), x == -8.0 or x == 0.0, false)
-	for x in [-10.0, -6.0, -2.0, 2.0]:
-		_window(self, Vector3(x, 5.0, -5.95), x == -2.0, false)
-	# Teal door on building A.
-	Prim.box(self, Vector3(-12, 1.1, -5.95), Vector3(1.2, 2.2, 0.1), SHUTTER_TEAL)
-	# Water tank on the roof.
-	Prim.cyl(self, Vector3(-8, 7.9, -7.5), 0.9, 1.2, Prim.tmat("plaster", Color("b8b0a0"), Vector3(2, 2, 2)))
-	Prim.cyl(self, Vector3(-8, 8.55, -7.5), 0.95, 0.08, Color("1a1a1a"))
+	# Blender-modelled buildings (tools/build_dharavi.py). The .glb files
+	# are the visuals; invisible collision boxes keep the player out.
+	# (Windows, balconies, AC units, parapets, pipes, door, tank, shop
+	# shutter and signboard are all in the models now.)
+	var a := BuildingA.instantiate()
+	add_child(a)
+	Prim.collision_box(self, Vector3(-4, 3.5, -7.5), Vector3(20, 7, 3))
+	var b := BuildingB.instantiate()
+	add_child(b)
+	Prim.collision_box(self, Vector3(-7.5, 3.0, -4), Vector3(3, 6, 20))
 	# Washing line + cloths on building A's front.
 	Prim.box(self, Vector3(-7, 4.3, -5.8), Vector3(8, 0.02, 0.02), Color("111111"))
 	var cloth_colors := [Color("e85a48"), Color("4a8ad9"), Color("f0e8d0")]
 	for i in 3:
 		var cx := -10.0 + float(i) * 3.0
 		Prim.box(self, Vector3(cx, 3.85, -5.8), Vector3(0.7, 0.9, 0.03), cloth_colors[i], 0.0, Vector3(0, 0, 0.05 if i % 2 == 0 else -0.05))
-
-	# Building B — faded red chawl along the west side (faces east).
-	Prim.solid_box(self, Vector3(-7.5, 3.0, -4), Vector3(3, 6, 20), Prim.tmat("brick_red", Color.WHITE, Vector3(1.5, 3, 10)))
-	Prim.box(self, Vector3(-7.5, 6.1, -4), Vector3(3.2, 0.15, 20.2), Prim.tmat("tin", Color.WHITE, Vector3(1.6, 1, 10)), 0.0, Vector3(0, 0, 0.08))
-	for z in [-12.0, -8.0, -4.0, 0.0]:
-		_window(self, Vector3(-5.95, 2.2, z), z == -8.0, true)
-	for z in [-10.0, -6.0, -2.0, 2.0]:
-		_window(self, Vector3(-5.95, 4.6, z), z == -2.0, true)
-	# Corner shop: green shutter + signboard on building B's east face.
-	Prim.box(self, Vector3(-5.93, 1.2, 1.5), Vector3(0.1, 2.4, 2.2), Prim.tmat("wood", SHUTTER_GREEN, Vector3(1, 2, 2)))
-	Prim.box(self, Vector3(-5.93, 2.8, 1.5), Vector3(0.1, 0.5, 2.4), Color("e8b93c"))
+	# GENERAL STORE sign text on building B's signboard.
 	var shop_sign := Label3D.new()
 	shop_sign.text = "GENERAL STORE"
 	shop_sign.font_size = 32
@@ -194,7 +165,7 @@ func _build_stall_and_auto() -> void:
 	stall.position = Vector3(-4.4, 0.12, -4.4)
 	stall.rotation.y = PI / 4
 	add_child(stall)
-	var auto: Node3D = AutoScript.create()
+	var auto := AutoModel.instantiate()
 	auto.position = Vector3(3.2, 0.12, 1.0)
 	auto.rotation.y = -0.5
 	add_child(auto)
@@ -222,16 +193,20 @@ func _build_props() -> void:
 	Prim.cyl(cart, Vector3(1.0, 0.45, -0.3), 0.03, 0.7, WOOD_DARK, 0.0, Vector3(0, 0, 1.1))
 
 	# --- SA-DE density pass (2026-11-15) ---
-	# Streetlight with a warm lamp (second light source after the stall).
-	Prim.cyl(self, Vector3(5.5, 2.5, -2), 0.07, 5.0, Color("1c1c1c"))
-	Prim.box(self, Vector3(5.2, 4.95, -2), Vector3(0.7, 0.08, 0.08), Color("1c1c1c"))
-	Prim.box(self, Vector3(4.85, 4.9, -2), Vector3(0.45, 0.1, 0.22), Color("ffca7a"), 2.0)
+	# Streetlight (Blender model) with its warm lamp light.
+	var streetlight := StreetlightModel.instantiate()
+	streetlight.position = Vector3(5.5, 0, -2)
+	add_child(streetlight)
 	var lamp := OmniLight3D.new()
 	lamp.position = Vector3(4.85, 4.7, -2)
 	lamp.light_color = Color("ffd9a0")
 	lamp.light_energy = 1.4
 	lamp.omni_range = 9.0
 	add_child(lamp)
+	# Tree on the east side, behind the auto.
+	var tree := TreeModel.instantiate()
+	tree.position = Vector3(7, 0, -4)
+	add_child(tree)
 	# Trash bags near building B.
 	for tb in [Vector3(-6.4, 0.22, 2.4), Vector3(-6.0, 0.2, 2.9), Vector3(-6.5, 0.45, 2.7)]:
 		var bag := Prim.sphere(self, tb, 0.32, Color("161616"))
@@ -277,9 +252,9 @@ func _build_camera() -> void:
 
 
 func _build_player() -> void:
-	# No player in --shot / --shot-de mode: the fixed camera owns the frame.
+	# No player in --shot / --shot-de / --shot-real mode: the fixed camera owns the frame.
 	# (--shot-player spawns the player and shoots from his camera.)
-	if "--shot" in OS.get_cmdline_user_args() or "--shot-de" in OS.get_cmdline_user_args():
+	if "--shot" in OS.get_cmdline_user_args() or "--shot-de" in OS.get_cmdline_user_args() or "--shot-real" in OS.get_cmdline_user_args():
 		return
 	var player := PlayerScene.instantiate()
 	player.position = Vector3(0, 0.3, 8)
@@ -296,6 +271,8 @@ func _take_screenshot() -> void:
 		path = "res://docs/step3_shot.png"
 	elif "--shot-de" in OS.get_cmdline_user_args():
 		path = "res://docs/step2_shot_de.png"
+	elif "--shot-real" in OS.get_cmdline_user_args():
+		path = "res://docs/step2_shot_realistic.png"
 	var err := img.save_png(path)
 	if err == OK:
 		print("[Mayanagri] screenshot saved to ", path, " (", img.get_width(), "x", img.get_height(), ")")

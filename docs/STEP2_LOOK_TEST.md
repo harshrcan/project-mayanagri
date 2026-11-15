@@ -199,3 +199,65 @@ Open question: **realistic-modern (GTA V style) or stylized-modern
 outside the repo): `~/workspace/ref_gta5.jpg`,
 `~/workspace/ref_stylized.jpg`. The new look test starts once Harsh
 picks.
+
+**PICKED 2026-11-15: realistic, GTA V style.** The rebuild spec
+(Step 2 v3):
+
+- Blender-modelled, not primitives: `tools/build_dharavi.py` builds
+  Building A + B (window frames + sills + glass, balconies with
+  railings, parapets, AC units, pipes, plinth, teal door, water tank,
+  shop awning), a streetlight with a curved arm, a tree, and a
+  detailed auto — exported as `.glb` to `world/models/` +
+  `vehicles/auto.glb`. Bevels on the main masses so edges catch
+  light. UVs by cube projection (2 m tiles on walls).
+- Textures upgraded to 512px with more detail (grime, cracks,
+  patches) + new concrete, leaves, bark. Still procedural, still
+  ours.
+- Godot side: the `.glb` files are the visuals; invisible collision
+  boxes keep the player out of the walls (same footprints as before,
+  so the layout and the Step 3 tests don't move). Small props
+  (stall, crates, sacks, drum, plants, posters, dashes) stay
+  Prim-based for this pass. The primitive Vee stays for this pass
+  too — the environment is the deliverable; a modelled character is
+  the next modelling task.
+- Light stays golden evening (sun 1.3, fog 0.006, ambient 0.6) —
+  the realism comes from geometry + textures, not a new time of day.
+- Check: fixed shot + gameplay shot read as a modern 3D street,
+  not a textured box diorama.
+
+### Realistic rebuild — BUILT 2026-11-15 (5 iterations)
+
+- **Iteration 1:** models in, shot reads as a real street (frames,
+  balconies, AC, parapet, tree, detailed auto) — but the windows
+  were flat grey, the auto pale green-yellow, the tree a smooth blob.
+- **Iteration 2:** glass metallic 0.3→0 (it was mirroring the sky),
+  sun elevation −16°→−28°, ambient 0.6→0.7, tree made irregular.
+  Windows went dark, but the lit ones still didn't glow and the
+  auto's roof read light grey.
+- **Iteration 3:** ambient warmed (`#66779a`→`#7a7f92`, the blue
+  ambient was turning the yellow auto green), sun 1.3→1.5,
+  steel metallic 0.4→0.1, tree rebuilt as 9 smaller blobs, leaves
+  darkened. Auto reads yellow; roof still light.
+- **Iteration 4:** roof given a near-black matte canopy material.
+  Shot looked unchanged — **lesson: Godot caches .glb imports; after
+  re-exporting a .glb you must re-run `--headless --editor --quit
+  --import` before the runtime sees the new model.**
+- **Iteration 5 (the bug):** the lit windows still didn't glow. The
+  .glb JSON proved the emission was exported correctly — the real
+  bug was geometry: the window "frame" was a SOLID box and the glass
+  sat inside it, invisible. Real windows now: glass on the wall,
+  frame as 4 bars proud of it, sill below. Same fix for the teal
+  door (panel moved proud of its frame). Windows now show dark glass
+  + warm lit glass with real frames.
+- **Final shots:** `docs/step2_shot_realistic.png` (fixed camera) and
+  `docs/step3_shot.png` (gameplay view, re-shot). Verification:
+  headless import clean, headless run exit 0 (`Dharavi corner
+  ready.`), player tests 15/15 PASS.
+- **Still placeholder / known gaps:** Vee is still the primitive
+  blocky figure (reads out of place next to the realistic corner —
+  a modelled character is the next modelling task); the tree is
+  still blobby up close (stylized, needs leaf-card work later); the
+  chai stall is still Prim-based; lit windows glow white-ish rather
+  than warm orange under ACES.
+- **Gate:** Harsh's verdict — lock it (then Step 4 vehicles) or list
+  changes.
