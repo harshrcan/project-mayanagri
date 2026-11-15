@@ -1,0 +1,29 @@
+# Godot 4 — generated / local files
+.godot/
+*.tmp
+
+# Godot import cache (regenerated on import; .import files ARE committed)
+# (nothing else here — keep .import files in version control)
+
+# Build outputs — never commit
+build/
+export/
+*.exe
+*.apk
+*.pck
+*.zip
+
+# Blender working files
+*.blend1
+*.blend2
+*.blend3
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+
+# Local tool config (per-machine, not shared)
+# (Godot editor settings live in ~/.config/godot, not in the repo)
